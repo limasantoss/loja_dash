@@ -4,7 +4,7 @@ from datetime import datetime
 from streamlit_js_eval import streamlit_js_eval
 
 st.set_page_config(page_title="🤖 ZentsBot", layout="centered")
-st.title("🤖 ZentsBot - Seu assistente de análise")
+st.title("🤖 ZentsBot - Seu assistente de análise -  o peridodo nao ta funcionando corrigir dps")
 
 # A detecção de tela e o carregamento dos dados continuam iguais.
 screen_width = streamlit_js_eval(js_expressions='window.innerWidth', key='SCR_WIDTH') or 769
