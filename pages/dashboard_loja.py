@@ -31,7 +31,8 @@ SELLER_ID_ESCOLHIDO = "4a3ca9315b744ce9f8e9374361493884"
 # --- FUNÇÕES ---
 @st.cache_data
 def carregar_dados_vendedor(seller_id):
-    df_total = pd.read_csv("../data/processed/dataset_olist_final_limpo.csv", parse_dates=["order_purchase_timestamp", "order_delivered_customer_date"])
+    # CORREÇÃO 1: Ajustado o caminho para "subir" um nível e encontrar o CSV na pasta principal.
+    df_total = pd.read_csv("../dataset_olist_final_limpo.csv", parse_dates=["order_purchase_timestamp", "order_delivered_customer_date"])
     df_seller = df_total[df_total['seller_id'] == seller_id].copy()
     
     try:
@@ -112,10 +113,20 @@ st.sidebar.code(f"{SELLER_ID_ESCOLHIDO}")
 st.sidebar.markdown("---")
 data_min_loja = df_loja["order_purchase_timestamp"].min().date()
 data_max_loja = df_loja["order_purchase_timestamp"].max().date()
-date_range = st.sidebar.slider("Selecione o período:", min_value=data_min_loja, max_value=data_max_loja, value=(data_min_loja, data_max_loja))
+
+# CORREÇÃO 2: Adicionada a "key" para salvar o estado do filtro de data e compartilhá-lo com outras páginas.
+st.sidebar.slider(
+    "Selecione o período:", 
+    min_value=data_min_loja, 
+    max_value=data_max_loja, 
+    value=(data_min_loja, data_max_loja),
+    key="date_range"  # Esta chave salva o valor em st.session_state.date_range
+)
+
 st.sidebar.markdown("---") 
 selecao = st.sidebar.radio("Navegue pelas seções:", ["Visão Geral", "Meus Produtos", "Análise de Logística", ])
-start_date, end_date = date_range
+
+start_date, end_date = st.session_state.date_range # Lendo o valor salvo na sessão
 df_filtrado = df_loja[(df_loja["order_purchase_timestamp"].dt.date >= start_date) & (df_loja["order_purchase_timestamp"].dt.date <= end_date)]
 
 # --- LÓGICA DE EXIBIÇÃO DAS PÁGINAS ---
@@ -133,6 +144,7 @@ if selecao == "Visão Geral":
         col1.metric("Faturamento Total", f"R$ {faturamento_total:,.2f}")
         col2.metric("Total de Pedidos", f"{pedidos_totais}")
         col3.metric("Ticket Médio", f"R$ {ticket_medio:,.2f}")
+        col4.metric("Nota Média", f"{nota_media:.2f} ⭐") # Adicionei a nota média que estava faltando
         st.markdown("---")
         
         col_graf1, col_graf2 = st.columns(2)
@@ -226,4 +238,3 @@ elif selecao == "Análise de Logística":
             st.plotly_chart(fig_scatter, use_container_width=True)
     else:
         st.warning("Não há dados de logística no período selecionado.")
-

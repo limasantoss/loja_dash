@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -8,7 +7,8 @@ st.title("🤖 ZentsBot - Seu assistente de análise")
 
 @st.cache_data
 def carregar_dados():
-    df = pd.read_csv("../data/processed/dataset_olist_final_limpo.csv", parse_dates=["order_purchase_timestamp", "order_delivered_customer_date", "order_estimated_delivery_date"])
+    # CORREÇÃO APLICADA AQUI: O caminho agora está correto para este arquivo.
+    df = pd.read_csv("dataset_olist_final_limpo.csv", parse_dates=["order_purchase_timestamp", "order_delivered_customer_date", "order_estimated_delivery_date"])
     df["tempo_entrega"] = (df["order_delivered_customer_date"] - df["order_purchase_timestamp"]).dt.days
     return df
 
@@ -78,4 +78,4 @@ if pergunta:
         elif "cliente" in pergunta_lower and "único" in pergunta_lower:
             resposta = f"👤 Clientes únicos: **{df['customer_id'].nunique():,}**"
 
-    st.success(resposta)
+st.success(resposta)
