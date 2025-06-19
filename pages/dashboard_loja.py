@@ -31,8 +31,8 @@ SELLER_ID_ESCOLHIDO = "4a3ca9315b744ce9f8e9374361493884"
 # --- FUNÇÕES ---
 @st.cache_data
 def carregar_dados_vendedor(seller_id):
-    # CORREÇÃO 1: Ajustado o caminho para "subir" um nível e encontrar o CSV na pasta principal.
-    df_total = pd.read_csv("../dataset_olist_final_limpo.csv", parse_dates=["order_purchase_timestamp", "order_delivered_customer_date"])
+    # CORREÇÃO: O caminho foi ajustado para a raiz do projeto, que é o correto para o Streamlit.
+    df_total = pd.read_csv("dataset_olist_final_limpo.csv", parse_dates=["order_purchase_timestamp", "order_delivered_customer_date"])
     df_seller = df_total[df_total['seller_id'] == seller_id].copy()
     
     try:
@@ -114,7 +114,6 @@ st.sidebar.markdown("---")
 data_min_loja = df_loja["order_purchase_timestamp"].min().date()
 data_max_loja = df_loja["order_purchase_timestamp"].max().date()
 
-# CORREÇÃO 2: Adicionada a "key" para salvar o estado do filtro de data e compartilhá-lo com outras páginas.
 st.sidebar.slider(
     "Selecione o período:", 
     min_value=data_min_loja, 
@@ -144,7 +143,7 @@ if selecao == "Visão Geral":
         col1.metric("Faturamento Total", f"R$ {faturamento_total:,.2f}")
         col2.metric("Total de Pedidos", f"{pedidos_totais}")
         col3.metric("Ticket Médio", f"R$ {ticket_medio:,.2f}")
-        col4.metric("Nota Média", f"{nota_media:.2f} ⭐") # Adicionei a nota média que estava faltando
+        col4.metric("Nota Média", f"{nota_media:.2f} ⭐")
         st.markdown("---")
         
         col_graf1, col_graf2 = st.columns(2)
