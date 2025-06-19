@@ -7,7 +7,6 @@ st.title("🤖 ZentsBot - Seu assistente de análise")
 
 @st.cache_data
 def carregar_dados():
-    # CORREÇÃO APLICADA AQUI: O caminho agora está correto para este arquivo.
     df = pd.read_csv("dataset_olist_final_limpo.csv", parse_dates=["order_purchase_timestamp", "order_delivered_customer_date", "order_estimated_delivery_date"])
     df["tempo_entrega"] = (df["order_delivered_customer_date"] - df["order_purchase_timestamp"]).dt.days
     return df
@@ -78,4 +77,5 @@ if pergunta:
         elif "cliente" in pergunta_lower and "único" in pergunta_lower:
             resposta = f"👤 Clientes únicos: **{df['customer_id'].nunique():,}**"
 
-st.success(resposta)
+    # CORREÇÃO: A linha abaixo foi movida para dentro do 'if' para evitar o NameError.
+    st.success(resposta)
