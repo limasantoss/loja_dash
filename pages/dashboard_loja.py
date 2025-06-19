@@ -48,59 +48,6 @@ def carregar_dados_vendedor(seller_id):
     
     return df_seller
 
-def get_periodo_anterior(data_inicio_atual, data_fim_atual):
-    duracao = (data_fim_atual - data_inicio_atual) + timedelta(days=1)
-    fim_anterior = data_inicio_atual - timedelta(days=1)
-    inicio_anterior = fim_anterior - duracao + timedelta(days=1)
-    return inicio_anterior, fim_anterior
-
-# A função agora recebe as datas do slider para ser mais precisa
-def gerar_resposta_vendedor(pergunta, df_filtrado, df_loja_completa, start_date_selecionada, end_date_selecionada):
-    pergunta = pergunta.lower()
-    if df_filtrado.empty:
-        return "Não encontrei dados para o período selecionado."
-
-    if "faturamento" in pergunta or ("vendas" in pergunta and "dia" not in pergunta):
-        faturamento_atual = df_filtrado['payment_value'].sum()
-        
-        # Usa as datas exatas do slider para calcular o período anterior
-        inicio_anterior, fim_anterior = get_periodo_anterior(start_date_selecionada, end_date_selecionada)
-        
-        df_anterior = df_loja_completa[(df_loja_completa['order_purchase_timestamp'].dt.date >= inicio_anterior) & (df_loja_completa['order_purchase_timestamp'].dt.date <= fim_anterior)]
-        faturamento_anterior = df_anterior['payment_value'].sum()
-        
-        resposta = f"Seu faturamento no período foi de **R$ {faturamento_atual:,.2f}**."
-        if faturamento_anterior > 0:
-            variacao = ((faturamento_atual - faturamento_anterior) / faturamento_anterior) * 100
-            if variacao > 0.1: resposta += f" Isso representa uma **alta de {variacao:.1f}%** em relação ao período anterior."
-            elif variacao < -0.1: resposta += f" Isso representa uma **queda de {abs(variacao):.1f}%** em relação ao período anterior."
-            else: resposta += " O valor se manteve estável em relação ao período anterior."
-        return resposta
-    elif "pedidos" in pergunta:
-        pedidos_atuais = df_filtrado['order_id'].nunique()
-        
-        # Usa as datas exatas do slider
-        inicio_anterior, fim_anterior = get_periodo_anterior(start_date_selecionada, end_date_selecionada)
-
-        df_anterior = df_loja_completa[(df_loja_completa['order_purchase_timestamp'].dt.date >= inicio_anterior) & (df_loja_completa['order_purchase_timestamp'].dt.date <= fim_anterior)]
-        pedidos_anteriores = df_anterior['order_id'].nunique()
-        resposta = f"Você teve **{pedidos_atuais}** pedidos no período."
-        if pedidos_anteriores > 0:
-            variacao = ((pedidos_atuais - pedidos_anteriores) / pedidos_anteriores) * 100
-            if variacao > 0.1: resposta += f" **Alta de {variacao:.1f}%** em relação ao período anterior."
-            elif variacao < -0.1: resposta += f" **Queda de {abs(variacao):.1f}%** em relação ao período anterior."
-        return resposta
-    elif "produto mais vendido" in pergunta:
-        if not df_filtrado.empty and not df_filtrado['product_category_name_english'].isnull().all():
-            top_produto = df_filtrado['product_category_name_english'].value_counts().idxmax()
-            return f"🏆 Seu produto mais vendido no período foi **{top_produto}**."
-        else: return "Não há vendas de produtos no período para analisar."
-    elif "tempo de entrega" in pergunta:
-        tempo_medio = df_filtrado['tempo_entrega'].mean()
-        return f"🚚 Seu tempo médio de entrega para os pedidos do período é de **{tempo_medio:.1f} dias**."
-    else:
-        return "❓ Desculpe, não entendi. Tente perguntar sobre `faturamento`, `pedidos`, `produto mais vendido` ou `tempo de entrega`."
-
 # --- CARREGAMENTO E VALIDAÇÃO DOS DADOS ---
 try:
     df_loja = carregar_dados_vendedor(SELLER_ID_ESCOLHIDO)
@@ -111,7 +58,7 @@ except Exception as e:
     st.error(f"Erro ao carregar o arquivo de dados: {e}")
     st.stop()
 
-# --- SIDEBAR COM FILTROS E NAVEGAÇÃO ---
+# --- SIDEBAR COM FILTROS ---
 st.sidebar.title("Portal do Vendedor")
 st.sidebar.markdown(f"**Loja em análise:**")
 st.sidebar.code(f"{SELLER_ID_ESCOLHIDO}")
@@ -126,22 +73,7 @@ st.sidebar.slider(
     value=(data_min_loja, data_max_loja),
     key="date_range"
 )
-
 st.sidebar.markdown("---") 
-
-# Adicionando um chatbot na sidebar
-st.sidebar.subheader("Converse com seus dados")
-pergunta_sidebar = st.sidebar.text_input("Faça uma pergunta sobre o período selecionado:")
-
-# Filtra o dataframe para o chatbot da sidebar com base no slider
-start_date_slider, end_date_slider = st.session_state.date_range
-df_filtrado_sidebar = df_loja[(df_loja["order_purchase_timestamp"].dt.date >= start_date_slider) & (df_loja["order_purchase_timestamp"].dt.date <= end_date_slider)]
-
-if pergunta_sidebar:
-    # Passa as datas do slider ao chamar a função
-    resposta_sidebar = gerar_resposta_vendedor(pergunta_sidebar, df_filtrado_sidebar, df_loja, start_date_slider, end_date_slider)
-    st.sidebar.success(resposta_sidebar)
-
 
 # --- NAVEGAÇÃO PRINCIPAL ---
 selecao = st.radio("Navegue pelas seções:", ["Visão Geral", "Meus Produtos", "Análise de Logística"], horizontal=True)
