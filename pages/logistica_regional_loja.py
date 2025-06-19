@@ -37,20 +37,46 @@ df_filtrado = df_total[
     (df_total["order_purchase_timestamp"].dt.date <= end_date)
 ]
 
-st.info(f"Análise entre **{start_date.strftime('%d/%m/%Y')}** e **{end_date.strftime('%d/%m/%Y')}**", icon="📅")
-
 # Filtro por regiões
 norte = ["AM", "RR", "AP", "PA", "TO", "RO", "AC"]
 nordeste = ["MA", "PI", "CE", "RN", "PB", "PE", "AL", "SE", "BA"]
-df_log = df_filtrado[df_filtrado["customer_state"].isin(norte + nordeste)].copy()
+df_log_regional = df_filtrado[df_filtrado["customer_state"].isin(norte + nordeste)].copy()
+
+
+# --- NOVO: LÓGICA DO FILTRO DE CIDADE ---
+st.markdown("---")
+if not df_log_regional.empty:
+    # Popula a lista de cidades com base nos dados já filtrados por região e data
+    cidades_disponiveis = sorted(df_log_regional['customer_city'].unique())
+    
+    cidades_selecionadas = st.multiselect(
+        "Filtre por Cidade (opcional):",
+        options=cidades_disponiveis,
+        placeholder="Selecione uma ou mais cidades"
+    )
+
+    # Aplica o filtro de cidade se alguma for selecionada
+    if cidades_selecionadas:
+        df_log = df_log_regional[df_log_regional['customer_city'].isin(cidades_selecionadas)].copy()
+    else:
+        # Se nenhuma cidade for selecionada, usa todos os dados das regiões
+        df_log = df_log_regional
+else:
+    df_log = df_log_regional # Garante que df_log exista mesmo se vazio
+
+
+# Mostra o período de análise e o filtro de cidades aplicado
+cidades_info = ", ".join(cidades_selecionadas) if cidades_selecionadas else "Todas as cidades"
+st.info(f"Análise entre **{start_date.strftime('%d/%m/%Y')}** e **{end_date.strftime('%d/%m/%Y')}** para: **{cidades_info}**.", icon="🏙️")
+
 
 if df_log.empty:
-    st.warning("Não há dados para as regiões Norte e Nordeste no período selecionado.")
+    st.warning("Não há dados para os filtros selecionados.")
     st.stop()
 
 
 st.markdown("---")
-# Calcula os valores para os indicadores com base nos dados já filtrados por período e região
+# Calcula os valores para os indicadores com base nos dados já filtrados
 faturamento_total = df_log['payment_value'].sum()
 pedidos_totais = df_log['order_id'].nunique()
 ticket_medio = faturamento_total / pedidos_totais if pedidos_totais > 0 else 0
