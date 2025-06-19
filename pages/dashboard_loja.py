@@ -10,16 +10,10 @@ st.set_page_config(
     page_icon="🏪"
 )
 
-# --- ESTILOS CSS (MODO ESCURO) ---
+# --- ESTILOS CSS (VERSÃO FINAL) ---
 st.markdown("""
     <style>
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-        .stApp {
-            background-color: #0E1117;
-            color: #FAFAFA;
-            font-family: 'Segoe UI', sans-serif;
-        }
+     
     </style>
 """, unsafe_allow_html=True)
 
@@ -122,7 +116,7 @@ if selecao == "Visão Geral":
         with col_mapa:
             vendas_estado = df_filtrado_pagina['customer_state'].value_counts().reset_index()
             vendas_estado.columns = ['state_code', 'orders']
-            fig_mapa = px.choropleth(vendas_estado, geojson="https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson", locations='state_code', featureidkey="properties.sigla", color='orders', color_continuous_scale="Blues", scope="south america", title="Mapa de Pedidos por Estado")
+            fig_mapa = px.choropleth(vendas_estado, geojson="https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson", locations='state_code', featureidkey="properties.sigla", color='orders', color_continuous_scale="Oranges", scope="south america", title="Mapa de Pedidos por Estado")
             fig_mapa.update_geos(fitbounds="locations", visible=False)
             st.plotly_chart(fig_mapa, use_container_width=True)
         with col_pizza:

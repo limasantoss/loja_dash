@@ -1,0 +1,21 @@
+# .streamlit/config.toml
+
+[theme]
+# Força o uso de um tema claro como base
+base="light"
+
+# Cor principal para widgets interativos (botões, sliders, etc.)
+# Eu já configurei para usar o seu laranja!
+primaryColor="#FF6F17"
+
+# Cor de fundo principal da aplicação
+backgroundColor="#FFFFFF"
+
+# Cor de fundo secundária (para a sidebar, expanders, etc.)
+secondaryBackgroundColor="#F0F2F6"
+
+# Cor principal do texto
+textColor="#111111"
+
+# Tipo da fonte
+font="sans serif"
