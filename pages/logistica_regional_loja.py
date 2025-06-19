@@ -7,7 +7,6 @@ st.title("📦 Logística por Região - Norte e Nordeste")
 
 @st.cache_data
 def carregar_dados():
-    # O caminho para o CSV está correto, buscando da raiz do projeto.
     df = pd.read_csv(
         "dataset_olist_final_limpo.csv",
         parse_dates=["order_purchase_timestamp", "order_delivered_customer_date", "order_estimated_delivery_date"]
@@ -22,28 +21,22 @@ except Exception as e:
     st.error(f"Erro ao carregar dados: {e}")
     st.stop()
 
-# --- LÓGICA DO FILTRO DE DATA (MODIFICADA) ---
-
-# 1. Obter o intervalo de datas completo do dataset para definir os limites do slider.
+# --- LÓGICA DO FILTRO DE DATA ---
 data_min_geral = df_total["order_purchase_timestamp"].min().date()
 data_max_geral = df_total["order_purchase_timestamp"].max().date()
 
-# 2. NOVO: Adicionado um slider de data local para esta página.
-#    A lógica que lia o filtro da sessão foi removida.
 start_date, end_date = st.slider(
     "Selecione o período:",
     min_value=data_min_geral,
     max_value=data_max_geral,
-    value=(data_min_geral, data_max_geral) # O valor padrão é o período completo
+    value=(data_min_geral, data_max_geral)
 )
 
-# 3. Filtrar o DataFrame com as datas selecionadas no novo slider.
 df_filtrado = df_total[
     (df_total["order_purchase_timestamp"].dt.date >= start_date) &
     (df_total["order_purchase_timestamp"].dt.date <= end_date)
 ]
 
-# Mostrar o período selecionado
 st.info(f"Análise entre **{start_date.strftime('%d/%m/%Y')}** e **{end_date.strftime('%d/%m/%Y')}**", icon="📅")
 
 # Filtro por regiões
@@ -54,6 +47,20 @@ df_log = df_filtrado[df_filtrado["customer_state"].isin(norte + nordeste)].copy(
 if df_log.empty:
     st.warning("Não há dados para as regiões Norte e Nordeste no período selecionado.")
     st.stop()
+
+# --- NOVO: KPIs (INDICADORES) ---
+st.markdown("---")
+# Calcula os valores para os indicadores com base nos dados já filtrados por período e região
+faturamento_total = df_log['payment_value'].sum()
+pedidos_totais = df_log['order_id'].nunique()
+ticket_medio = faturamento_total / pedidos_totais if pedidos_totais > 0 else 0
+
+# Cria 3 colunas e exibe cada indicador
+col1, col2, col3 = st.columns(3)
+col1.metric("Faturamento Total", f"R$ {faturamento_total:,.2f}")
+col2.metric("Total de Pedidos", f"{pedidos_totais}")
+col3.metric("Ticket Médio", f"R$ {ticket_medio:,.2f}")
+st.markdown("---")
 
 # Gráficos
 st.markdown("### Entregas por Estado")
