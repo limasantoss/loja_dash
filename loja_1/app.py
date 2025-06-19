@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -9,7 +8,8 @@ st.set_page_config(page_title="📊 Loja Dashboard", layout="wide")
 # --- Dados e Setup ---
 @st.cache_data
 def carregar_dados():
-    df = pd.read_csv("dataset_olist_final_limpo.csv", parse_dates=["order_purchase_timestamp", "order_delivered_customer_date", "order_estimated_delivery_date"])
+    # CORREÇÃO APLICADA AQUI: Adicionado o caminho da subpasta 'loja_1/'
+    df = pd.read_csv("loja_1/dataset_olist_final_limpo.csv", parse_dates=["order_purchase_timestamp", "order_delivered_customer_date", "order_estimated_delivery_date"])
     df["tempo_entrega"] = (df["order_delivered_customer_date"] - df["order_purchase_timestamp"]).dt.days
     df["ano_mes"] = df["order_purchase_timestamp"].dt.to_period("M").astype(str)
     df["dia_da_semana"] = df["order_purchase_timestamp"].dt.day_name()
@@ -71,12 +71,18 @@ elif pagina == "Meus Produtos":
     df_prod = df.dropna(subset=['product_category_name_english'])
     col1, col2 = st.columns(2)
     with col1:
+        st.subheader("Top 5 Categorias (Faturamento)")
         top_faturamento = df_prod.groupby('product_category_name_english')['payment_value'].sum().nlargest(5).reset_index()
-        fig = px.bar(top_faturamento, x='payment_value', y='product_category_name_english', orientation='h')
+        fig = px.bar(top_faturamento, x='payment_value', y='product_category_name_english', orientation='h', text='payment_value')
+        fig.update_traces(texttemplate='R$ %{text:,.2f}', textposition='outside')
+        fig.update_layout(yaxis_title="Categoria", xaxis_title="Faturamento")
         st.plotly_chart(fig, use_container_width=True)
     with col2:
+        st.subheader("Top 5 Categorias (Unidades Vendidas)")
         top_unidades = df_prod['product_category_name_english'].value_counts().nlargest(5).reset_index()
-        fig2 = px.bar(top_unidades, x='count', y='product_category_name_english', orientation='h')
+        fig2 = px.bar(top_unidades, x='count', y='product_category_name_english', orientation='h', text='count')
+        fig2.update_traces(textposition='outside')
+        fig2.update_layout(yaxis_title="Categoria", xaxis_title="Unidades Vendidas")
         st.plotly_chart(fig2, use_container_width=True)
 
 # --- Análise de Logística ---
@@ -120,6 +126,10 @@ elif pagina == "ZentsBot 🤖":
         for regiao, estados in REGIOES.items():
             if regiao in pergunta_lower:
                 df_reg = df[df["customer_state"].isin(estados)]
+                if df_reg.empty:
+                    resposta = f"Não encontrei dados para a região {regiao.capitalize()} no período selecionado."
+                    break
+
                 if "entrega" in pergunta_lower and "tempo" in pergunta_lower:
                     resposta = f"📦 Tempo médio de entrega na região {regiao.capitalize()}: **{df_reg['tempo_entrega'].mean():.1f} dias**"
                 elif "frete" in pergunta_lower:
