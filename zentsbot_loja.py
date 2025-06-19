@@ -11,7 +11,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# Mantém apenas a cor de fundo no CSS geral
+#obs : ja coloquei para o streamlit força as cores dele msmo -> arquivo:streamlit ->config.toml
 st.markdown("""
     <style>
         
@@ -22,7 +22,7 @@ st.markdown("""
 st.image("icone.jpeg", width=150)
 
 # Título com cor customizada
-st.markdown("<h1 style='text-align: center; color: #FF6F17;'>🤖 ZentsBot - Seu assistente de análise</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #FF6F17;'>🤖 ZentsBot - :)</h1>", unsafe_allow_html=True)
 
 screen_width = streamlit_js_eval(js_expressions='window.innerWidth', key='SCR_WIDTH') or 769
 is_mobile = screen_width < 768
