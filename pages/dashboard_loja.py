@@ -10,7 +10,7 @@ st.set_page_config(
     page_icon="🏪"
 )
 
-# --- ESTILOS CSS (VERSÃO FINAL) ---
+
 st.markdown("""
     <style>
      
@@ -22,7 +22,7 @@ st.markdown("""
 SELLER_ID_ESCOLHIDO = "4a3ca9315b744ce9f8e9374361493884"
 
 
-# --- FUNÇÕES ---
+
 @st.cache_data
 def carregar_dados_vendedor(seller_id):
     df_total = pd.read_csv("dataset_olist_final_limpo.csv", parse_dates=["order_purchase_timestamp", "order_delivered_customer_date"])
@@ -42,7 +42,7 @@ def carregar_dados_vendedor(seller_id):
     
     return df_seller
 
-# --- CARREGAMENTO E VALIDAÇÃO DOS DADOS ---
+
 try:
     df_loja = carregar_dados_vendedor(SELLER_ID_ESCOLHIDO)
     if df_loja.empty:
@@ -52,7 +52,7 @@ except Exception as e:
     st.error(f"Erro ao carregar o arquivo de dados: {e}")
     st.stop()
 
-# --- SIDEBAR COM FILTROS ---
+# --- SIDEBAR 
 st.sidebar.title("Portal do Vendedor")
 st.sidebar.markdown(f"**Loja em análise:**")
 st.sidebar.code(f"{SELLER_ID_ESCOLHIDO}")
@@ -69,10 +69,10 @@ st.sidebar.slider(
 )
 st.sidebar.markdown("---") 
 
-# --- NAVEGAÇÃO PRINCIPAL ---
+
 selecao = st.radio("Navegue pelas seções:", ["Visão Geral", "Meus Produtos", "Análise de Logística"], horizontal=True)
 
-# Filtra o dataframe para os gráficos da página principal
+
 start_date, end_date = st.session_state.date_range 
 df_filtrado_pagina = df_loja[(df_loja["order_purchase_timestamp"].dt.date >= start_date) & (df_loja["order_purchase_timestamp"].dt.date <= end_date)]
 

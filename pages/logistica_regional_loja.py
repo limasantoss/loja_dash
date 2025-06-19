@@ -48,14 +48,14 @@ if df_log.empty:
     st.warning("Não há dados para as regiões Norte e Nordeste no período selecionado.")
     st.stop()
 
-# --- NOVO: KPIs (INDICADORES) ---
+
 st.markdown("---")
 # Calcula os valores para os indicadores com base nos dados já filtrados por período e região
 faturamento_total = df_log['payment_value'].sum()
 pedidos_totais = df_log['order_id'].nunique()
 ticket_medio = faturamento_total / pedidos_totais if pedidos_totais > 0 else 0
 
-# Cria 3 colunas e exibe cada indicador
+
 col1, col2, col3 = st.columns(3)
 col1.metric("Faturamento Total", f"R$ {faturamento_total:,.2f}")
 col2.metric("Total de Pedidos", f"{pedidos_totais}")

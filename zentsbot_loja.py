@@ -68,7 +68,7 @@ except Exception as e:
     st.stop()
 
 st.markdown("---")
-# Subtítulo com cor customizada
+
 st.markdown("<h3 style='color: #FF6F17;'>Selecione o Período para Análise</h3>", unsafe_allow_html=True)
 
 anos_disponiveis = sorted(df_total['order_purchase_timestamp'].dt.year.unique(), reverse=True)
@@ -95,7 +95,7 @@ def set_pergunta(pergunta):
 if 'pergunta_atual' not in st.session_state: st.session_state.pergunta_atual = ""
 
 if is_mobile:
-    # Subtítulo com cor customizada
+
     st.markdown("<h3 style='color: #FF6F17;'>Perguntas Rápidas</h3>", unsafe_allow_html=True)
     cols = st.columns(2)
     for i, pergunta_rapida in enumerate(PREGUNTAS_RAPIDAS):
