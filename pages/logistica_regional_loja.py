@@ -7,8 +7,9 @@ st.title("📦 Logística por Região - Norte e Nordeste")
 
 @st.cache_data
 def carregar_dados():
+    # CORREÇÃO 1: Ajustado o caminho para "subir" um nível e encontrar o CSV.
     df = pd.read_csv(
-        "../data/processed/dataset_olist_final_limpo.csv",
+        "../dataset_olist_final_limpo.csv",
         parse_dates=["order_purchase_timestamp", "order_delivered_customer_date", "order_estimated_delivery_date"]
     )
     df["tempo_entrega"] = (df["order_delivered_customer_date"] - df["order_purchase_timestamp"]).dt.days
@@ -16,28 +17,26 @@ def carregar_dados():
     return df
 
 try:
-    df = carregar_dados()
+    df_total = carregar_dados()
 except Exception as e:
     st.error(f"Erro ao carregar dados: {e}")
     st.stop()
 
-# Obter intervalo real do dataset
-data_min = df["order_purchase_timestamp"].min().date()
-data_max = df["order_purchase_timestamp"].max().date()
+# CORREÇÃO 2: Removido o st.slider local e adicionada a lógica para LER o filtro da sessão.
+# Isso garante que o filtro selecionado no "Portal do Vendedor" seja aplicado aqui também.
+data_min_geral = df_total["order_purchase_timestamp"].min().date()
+data_max_geral = df_total["order_purchase_timestamp"].max().date()
 
-# 🎯 Aqui está o filtro visual exatamente como no seu print
-start_date, end_date = st.slider(
-    "Selecione o período:",
-    min_value=data_min,
-    max_value=data_max,
-    value=(data_min, data_max),
-    format="YYYY-MM-DD"
-)
+if 'date_range' in st.session_state:
+    start_date, end_date = st.session_state.date_range
+else:
+    # Define um valor padrão caso o usuário acesse esta página diretamente
+    start_date, end_date = data_min_geral, data_max_geral
 
-# Filtrar o DataFrame pelas datas selecionadas
-df = df[
-    (df["order_purchase_timestamp"].dt.date >= start_date) &
-    (df["order_purchase_timestamp"].dt.date <= end_date)
+# Filtrar o DataFrame pelas datas selecionadas na sessão
+df_filtrado = df_total[
+    (df_total["order_purchase_timestamp"].dt.date >= start_date) &
+    (df_total["order_purchase_timestamp"].dt.date <= end_date)
 ]
 
 # Mostrar o período selecionado
@@ -46,7 +45,11 @@ st.info(f"Análise entre **{start_date.strftime('%d/%m/%Y')}** e **{end_date.str
 # Filtro por regiões
 norte = ["AM", "RR", "AP", "PA", "TO", "RO", "AC"]
 nordeste = ["MA", "PI", "CE", "RN", "PB", "PE", "AL", "SE", "BA"]
-df_log = df[df["customer_state"].isin(norte + nordeste)].copy()
+df_log = df_filtrado[df_filtrado["customer_state"].isin(norte + nordeste)].copy()
+
+if df_log.empty:
+    st.warning("Não há dados para as regiões Norte e Nordeste no período selecionado.")
+    st.stop()
 
 # Gráficos
 st.markdown("### Entregas por Estado")
