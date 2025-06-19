@@ -7,7 +7,7 @@ st.title("📦 Logística por Região - Norte e Nordeste")
 
 @st.cache_data
 def carregar_dados():
-    # CORREÇÃO FINAL: O caminho foi ajustado para a raiz do projeto.
+    # O caminho para o CSV está correto, buscando da raiz do projeto.
     df = pd.read_csv(
         "dataset_olist_final_limpo.csv",
         parse_dates=["order_purchase_timestamp", "order_delivered_customer_date", "order_estimated_delivery_date"]
@@ -22,17 +22,22 @@ except Exception as e:
     st.error(f"Erro ao carregar dados: {e}")
     st.stop()
 
-# Lógica para ler o filtro de data compartilhado (esta parte já estava correta)
+# --- LÓGICA DO FILTRO DE DATA (MODIFICADA) ---
+
+# 1. Obter o intervalo de datas completo do dataset para definir os limites do slider.
 data_min_geral = df_total["order_purchase_timestamp"].min().date()
 data_max_geral = df_total["order_purchase_timestamp"].max().date()
 
-if 'date_range' in st.session_state:
-    start_date, end_date = st.session_state.date_range
-else:
-    # Define um valor padrão caso o usuário acesse esta página diretamente
-    start_date, end_date = data_min_geral, data_max_geral
+# 2. NOVO: Adicionado um slider de data local para esta página.
+#    A lógica que lia o filtro da sessão foi removida.
+start_date, end_date = st.slider(
+    "Selecione o período:",
+    min_value=data_min_geral,
+    max_value=data_max_geral,
+    value=(data_min_geral, data_max_geral) # O valor padrão é o período completo
+)
 
-# Filtrar o DataFrame pelas datas selecionadas na sessão
+# 3. Filtrar o DataFrame com as datas selecionadas no novo slider.
 df_filtrado = df_total[
     (df_total["order_purchase_timestamp"].dt.date >= start_date) &
     (df_total["order_purchase_timestamp"].dt.date <= end_date)
