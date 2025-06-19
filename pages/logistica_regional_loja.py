@@ -7,9 +7,9 @@ st.title("📦 Logística por Região - Norte e Nordeste")
 
 @st.cache_data
 def carregar_dados():
-    # CORREÇÃO 1: Ajustado o caminho para "subir" um nível e encontrar o CSV.
+    # CORREÇÃO FINAL: O caminho foi ajustado para a raiz do projeto.
     df = pd.read_csv(
-        "../dataset_olist_final_limpo.csv",
+        "dataset_olist_final_limpo.csv",
         parse_dates=["order_purchase_timestamp", "order_delivered_customer_date", "order_estimated_delivery_date"]
     )
     df["tempo_entrega"] = (df["order_delivered_customer_date"] - df["order_purchase_timestamp"]).dt.days
@@ -22,8 +22,7 @@ except Exception as e:
     st.error(f"Erro ao carregar dados: {e}")
     st.stop()
 
-# CORREÇÃO 2: Removido o st.slider local e adicionada a lógica para LER o filtro da sessão.
-# Isso garante que o filtro selecionado no "Portal do Vendedor" seja aplicado aqui também.
+# Lógica para ler o filtro de data compartilhado (esta parte já estava correta)
 data_min_geral = df_total["order_purchase_timestamp"].min().date()
 data_max_geral = df_total["order_purchase_timestamp"].max().date()
 
