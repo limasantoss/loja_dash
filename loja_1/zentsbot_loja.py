@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -8,7 +7,7 @@ st.title("🤖 ZentsBot - Seu assistente de análise")
 
 @st.cache_data
 def carregar_dados():
-    df = pd.read_csv("../data/processed/dataset_olist_final_limpo.csv", parse_dates=["order_purchase_timestamp", "order_delivered_customer_date", "order_estimated_delivery_date"])
+    df = pd.read_csv("dataset_olist_final_limpo.csv", parse_dates=["order_purchase_timestamp", "order_delivered_customer_date", "order_estimated_delivery_date"])
     df["tempo_entrega"] = (df["order_delivered_customer_date"] - df["order_purchase_timestamp"]).dt.days
     return df
 
@@ -18,7 +17,6 @@ except Exception as e:
     st.error(f"Erro ao carregar dados: {e}")
     st.stop()
 
-# Filtro por período da sessão
 data_min = df_total["order_purchase_timestamp"].min().date()
 data_max = df_total["order_purchase_timestamp"].max().date()
 if 'date_range' in st.session_state:
@@ -33,7 +31,6 @@ df = df_total[
 
 st.info(f"Análise entre **{start_date.strftime('%d/%m/%Y')}** e **{end_date.strftime('%d/%m/%Y')}**", icon="📅")
 
-# Definição de regiões
 REGIOES = {
     "norte": ["AM", "RR", "AP", "PA", "TO", "RO", "AC"],
     "nordeste": ["MA", "PI", "CE", "RN", "PB", "PE", "AL", "SE", "BA"],
@@ -42,14 +39,12 @@ REGIOES = {
     "centro-oeste": ["MT", "MS", "GO", "DF"]
 }
 
-# Interface do bot
 pergunta = st.text_input("Digite sua pergunta sobre os dados:")
 
 if pergunta:
     pergunta_lower = pergunta.lower()
     resposta = "🤖 Ainda estou aprendendo como responder a isso."
 
-    # Verifica se a pergunta é regional
     for regiao, estados in REGIOES.items():
         if regiao in pergunta_lower:
             df_reg = df[df["customer_state"].isin(estados)]
@@ -65,7 +60,6 @@ if pergunta:
                 resposta = f"⏰ Percentual de pedidos com atraso na região {regiao.capitalize()}: **{pct:.1f}%**"
             break
 
-    # Respostas gerais
     if resposta.startswith("🤖"):
         if "entrega" in pergunta_lower and "tempo" in pergunta_lower:
             resposta = f"📦 Tempo médio de entrega: **{df['tempo_entrega'].mean():.1f} dias**"
