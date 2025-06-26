@@ -6,8 +6,8 @@ from streamlit_js_eval import streamlit_js_eval
 import re
 
 st.set_page_config(
-    page_title="ZentsBot", 
-    page_icon="icone.jpeg", # MUDANÇA: Usando sua logo como ícone da aba
+    page_title="", 
+    page_icon="", # MUDANÇA: Usando sua logo como ícone da aba
     layout="centered"
 )
 
