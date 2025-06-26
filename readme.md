@@ -35,7 +35,7 @@ Inclui painéis dinâmicos, filtros por período, análises detalhadas e chatbot
       streamlit run loja_bot.py
       ```
 
-5. **Acesse no navegador:**  
+5. **Acesse no navegador: * *  
     - [http://localhost:8501](http://localhost:8501)
 
 ---
