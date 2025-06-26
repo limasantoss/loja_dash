@@ -7,7 +7,7 @@ import re
 
 st.set_page_config(
     page_title="", 
-    page_icon="", # MUDANÇA: Usando sua logo como ícone da aba
+    page_icon="", #removi os icone da empresa 
     layout="centered"
 )
 
@@ -18,10 +18,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-
-#st.image("icone.jpeg", width=150)
-
-# Título com cor customizada
 st.markdown("<h1 style='text-align: center; color: #FF6F17;'>🤖 Botdash  :)</h1>", unsafe_allow_html=True)
 
 screen_width = streamlit_js_eval(js_expressions='window.innerWidth', key='SCR_WIDTH') or 769
