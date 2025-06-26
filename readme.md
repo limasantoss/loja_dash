@@ -1,4 +1,4 @@
-# 🛒 Dashboard de Análise da Loja
+#  Dashboard de Análise da Loja
 
 Dashboard interativo para análise de vendas, clientes e logística de uma loja virtual, desenvolvido em Python com **Streamlit** e **Plotly**.  
 Inclui painéis dinâmicos, filtros por período, análises detalhadas e chatbot para respostas rápidas sobre o desempenho da loja.
