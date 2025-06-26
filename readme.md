@@ -40,5 +40,4 @@ Inclui painéis dinâmicos, filtros por período, análises detalhadas e chatbot
 
 ---
 
-## Estrutura de Pastas
 
