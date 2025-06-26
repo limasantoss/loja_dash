@@ -19,10 +19,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-st.image("icone.jpeg", width=150)
+#st.image("icone.jpeg", width=150)
 
 # Título com cor customizada
-st.markdown("<h1 style='text-align: center; color: #FF6F17;'>🤖 ZentsBot  :)</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #FF6F17;'>🤖 Botdash  :)</h1>", unsafe_allow_html=True)
 
 screen_width = streamlit_js_eval(js_expressions='window.innerWidth', key='SCR_WIDTH') or 769
 is_mobile = screen_width < 768
